@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Instagram Replica - Login</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Custom Tailwind Configuration -->
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        'primary-blue': '#38bdf8',
+                        'primary-blue-dark': '#0284c7',
+                        'primary-green': '#4ade80',
+                        'primary-green-dark': '#16a34a',
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        /* Custom gradient animation */
+        @keyframes gradient {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+        
+        .animate-gradient {
+            background: linear-gradient(-45deg, #38bdf8, #4ade80, #0284c7, #16a34a);
+            background-size: 400% 400%;
+            animation: gradient 15s ease infinite;
+        }
+        
+        /* Custom input styling */
+        .custom-input:focus {
+            box-shadow: 0 0 0 3px rgba(56, 189, 248, 0.3);
+        }
+    </style>
+</head>
+<body class="min-h-screen bg-gray-50">
+    <div class="min-h-screen flex">
+        <!-- Left side - Login Form -->
+        <div class="w-full lg:w-1/2 flex items-center justify-center p-8">
+            <div class="w-full max-w-md">
+                <!-- Logo -->
+                <div class="mb-8">
+                    <h1 class="text-4xl font-bold bg-gradient-to-r from-primary-blue to-primary-green bg-clip-text text-transparent">
+                        Instagram Replica
+                    </h1>
+                    <p class="text-gray-600 mt-2">Welcome back! Please login to continue.</p>
+                </div>
+                
+                <!-- Error message -->
+                <div id="error-message" class="hidden bg-red-50 border border-red-200 text-red-600 px-4 py-3 rounded-lg mb-6">
+                    <p class="text-sm"></p>
+                </div>
+                
+                <!-- Login form -->
+                <div id="login-box">
+                    <form onsubmit="return false;" class="space-y-6">
+                        <div>
+                            <label for="email" class="block text-sm font-medium text-gray-700 mb-1">
+                                Email address
+                            </label>
+                            <input 
+                                type="email" 
+                                id="email" 
+                                placeholder="Enter your email" 
+                                required
+                                class="custom-input w-full px-4 py-3 rounded-lg border border-gray-300 focus:border-primary-blue focus:ring-2 focus:ring-primary-blue/20 focus:outline-none transition-all duration-200"
+                            >
+                        </div>
+                        <div>
+                            <label for="password" class="block text-sm font-medium text-gray-700 mb-1">
+                                Password
+                            </label>
+                            <input 
+                                type="password" 
+                                id="password" 
+                                placeholder="Enter your password" 
+                                required
+                                class="custom-input w-full px-4 py-3 rounded-lg border border-gray-300 focus:border-primary-blue focus:ring-2 focus:ring-primary-blue/20 focus:outline-none transition-all duration-200"
+                            >
+                        </div>
+                        <button 
+                            type="button" 
+                            id="login-btn"
+                            class="w-full bg-gradient-to-r from-primary-blue to-primary-green text-white py-3 rounded-lg font-semibold hover:opacity-90 transform hover:scale-[1.02] transition-all duration-200 shadow-lg hover:shadow-xl"
+                        >
+                            Log In
+                        </button>
+                    </form>
+                    
+                    <!-- Divider -->
+                    <div class="relative my-8">
+                        <div class="absolute inset-0 flex items-center">
+                            <div class="w-full border-t border-gray-300"></div>
+                        </div>
+                        <div class="relative flex justify-center text-sm">
+                            <span class="px-4 bg-gray-50 text-gray-500">OR</span>
+                        </div>
+                    </div>
+                    
+                    <!-- Forgot password link -->
+                    <div class="text-center mb-6">
+                        <a href="#" class="text-primary-blue hover:text-primary-blue-dark transition-colors duration-200">
+                            Forgot password?
+                        </a>
+                    </div>
+                </div>
+                
+                <!-- Sign out button (hidden by default) -->
+                <button 
+                    id="sign-out" 
+                    class="w-full border-2 border-red-400 text-red-400 py-3 rounded-lg font-semibold hover:bg-red-50 transition-all duration-200 hidden mb-6"
+                >
+                    Sign Out
+                </button>
+                
+                <!-- Sign up link -->
+                <div class="text-center p-4 bg-white rounded-lg border border-gray-200">
+                    Don't have an account? 
+                    <a href="/register" class="text-primary-blue hover:text-primary-blue-dark font-semibold transition-colors duration-200">
+                        Sign up
+                    </a>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Right side - Image -->
+        <div class="hidden lg:block lg:w-1/2 relative overflow-hidden">
+            <!-- Animated gradient background -->
+            <div class="absolute inset-0 animate-gradient"></div>
+            
+            <!-- Glass overlay -->
+            <div class="absolute inset-0 bg-white/10 backdrop-blur-sm"></div>
+            
+            <!-- Content on image -->
+            <div class="relative h-full flex items-center justify-center p-12">
+                <div class="text-center text-white">
+                    <h2 class="text-5xl font-bold mb-6">Connect with Friends</h2>
+                    <p class="text-xl mb-8 max-w-md mx-auto">
+                        Share your moments, follow friends, and discover amazing stories from people around the world.
+                    </p>
+                    
+                    <!-- Feature highlights -->
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mt-12">
+                        <div class="bg-white/20 backdrop-blur-md rounded-lg p-6">
+                            <div class="text-4xl mb-4">📸</div>
+                            <h3 class="font-semibold mb-2">Share Photos</h3>
+                            <p class="text-sm">Capture and share your best moments</p>
+                        </div>
+                        <div class="bg-white/20 backdrop-blur-md rounded-lg p-6">
+                            <div class="text-4xl mb-4">❤️</div>
+                            <h3 class="font-semibold mb-2">Connect</h3>
+                            <p class="text-sm">Follow friends and discover new people</p>
+                        </div>
+                        <div class="bg-white/20 backdrop-blur-md rounded-lg p-6">
+                            <div class="text-4xl mb-4">💬</div>
+                            <h3 class="font-semibold mb-2">Engage</h3>
+                            <p class="text-sm">Comment and interact with posts</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Decorative elements -->
+            <div class="absolute top-20 right-20 w-32 h-32 bg-white/20 rounded-full blur-3xl"></div>
+            <div class="absolute bottom-20 left-20 w-40 h-40 bg-primary-blue/20 rounded-full blur-3xl"></div>
+        </div>
+    </div>
+
+    <!-- Firebase JavaScript -->
+    <script type="module" src="/static/firebase-login.js"></script>
+</body>
+</html>
