@@ -1,0 +1,323 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Instagram Replica - {{ profile_user.username }}</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Font Awesome -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <!-- Custom Tailwind Configuration -->
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        'primary': '#38bdf8',
+                        'primary-dark': '#0284c7',
+                        'primary-light': '#bae6fd',
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        /* Custom animations */
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        
+        .animate-fade-in {
+            animation: fadeIn 0.5s ease-out;
+        }
+        
+        /* Custom image hover effects */
+        .post-overlay {
+            transition: opacity 0.3s ease;
+        }
+        
+        /* Custom scrollbar */
+        ::-webkit-scrollbar {
+            width: 6px;
+        }
+        
+        ::-webkit-scrollbar-track {
+            background: #f1f1f1;
+        }
+        
+        ::-webkit-scrollbar-thumb {
+            background: #38bdf8;
+            border-radius: 3px;
+        }
+        
+        ::-webkit-scrollbar-thumb:hover {
+            background: #0284c7;
+        }
+    </style>
+</head>
+<body class="bg-gray-50 min-h-screen">
+    <!-- Navigation Bar -->
+    <nav class="bg-white border-b border-gray-200 sticky top-0 z-50 shadow-sm">
+        <div class="container mx-auto px-4">
+            <div class="flex items-center justify-between h-16">
+                <!-- Logo -->
+                <a href="/timeline" class="text-2xl font-bold text-primary hover:text-primary-dark transition-colors">
+                    Instagram Replica
+                </a>
+                
+                <!-- Search and Actions -->
+                <div class="flex items-center space-x-4">
+                    <!-- Search Bar -->
+                    <div class="relative">
+                        <input type="text" 
+                               id="searchInput"
+                               placeholder="Search by profile name..." 
+                               class="w-64 pl-10 pr-4 py-2 rounded-lg border border-gray-300 focus:border-primary focus:ring-2 focus:ring-primary/20 focus:outline-none transition-all"
+                        >
+                        <i class="fas fa-search absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400"></i>
+                        <button onclick="searchUsers()" 
+                                class="absolute right-2 top-1/2 transform -translate-y-1/2 text-primary hover:text-primary-dark">
+                            <i class="fas fa-arrow-right"></i>
+                        </button>
+                    </div>
+                    
+                    <!-- Action Buttons -->
+                    <a href="/profile/{{ current_user.id }}" 
+                       class="flex items-center px-4 py-2 text-gray-700 hover:text-primary rounded-lg hover:bg-primary-light/20 transition-all duration-200">
+                        <i class="fas fa-user mr-2"></i> 
+                        Profile
+                    </a>
+                    <button onclick="createPost()" 
+                            class="flex items-center px-4 py-2 bg-primary text-white rounded-lg hover:bg-primary-dark transition-all duration-200 shadow-sm hover:shadow-md">
+                        <i class="fas fa-plus mr-2"></i> 
+                        New Post
+                    </button>
+                    <button id="sign-out" 
+                            class="flex items-center px-4 py-2 text-red-500 hover:text-red-600 rounded-lg hover:bg-red-50 transition-all duration-200">
+                        <i class="fas fa-sign-out-alt mr-2"></i> 
+                        Logout
+                    </button>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Profile Header -->
+    <div class="container mx-auto px-4 py-8">
+        <div class="max-w-4xl mx-auto">
+            <div class="flex flex-col md:flex-row items-start md:items-center space-y-6 md:space-y-0 md:space-x-12 mb-12">
+                <!-- Profile Picture -->
+                <div class="flex-shrink-0">
+                    <div class="w-32 h-32 md:w-40 md:h-40 rounded-full bg-gradient-to-br from-primary to-primary-dark p-1">
+                        <div class="w-full h-full rounded-full bg-white p-2">
+                            <div class="w-full h-full rounded-full bg-primary/10 flex items-center justify-center">
+                                <i class="fas fa-user text-4xl md:text-5xl text-primary"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Profile Info -->
+                <div class="flex-grow">
+                    <div class="flex flex-col md:flex-row md:items-center mb-6">
+                        <h1 class="text-3xl font-bold text-gray-900 mb-4 md:mb-0 md:mr-8">{{ profile_user.username }}</h1>
+                        {% if not is_own_profile %}
+                            <button id="followBtn" 
+                                    onclick="toggleFollow('{{ profile_user.id }}')"
+                                    class="px-6 py-2 bg-primary text-white rounded-lg hover:bg-primary-dark transition-all duration-200 focus:ring-4 focus:ring-primary/20">
+                                {{ 'Unfollow' if is_following else 'Follow' }}
+                            </button>
+                        {% else %}
+                            <button class="px-6 py-2 border border-gray-300 text-gray-700 rounded-lg hover:border-gray-400 transition-all duration-200">
+                                Edit Profile
+                            </button>
+                        {% endif %}
+                    </div>
+                    
+                    <!-- Stats -->
+                    <div class="flex space-x-8 mb-6">
+                        <div class="text-center">
+                            <span class="block text-xl font-bold text-gray-900">{{ posts|length }}</span>
+                            <span class="text-gray-500 text-sm">posts</span>
+                        </div>
+                        <a href="/followers/{{ profile_user.id }}" class="text-center hover:opacity-75 transition-opacity">
+                            <span class="block text-xl font-bold text-gray-900">{{ profile_user.followersCount or 0 }}</span>
+                            <span class="text-gray-500 text-sm">followers</span>
+                        </a>
+                        <a href="/following/{{ profile_user.id }}" class="text-center hover:opacity-75 transition-opacity">
+                            <span class="block text-xl font-bold text-gray-900">{{ profile_user.followingCount or 0 }}</span>
+                            <span class="text-gray-500 text-sm">following</span>
+                        </a>
+                    </div>
+                    
+                    <!-- Bio -->
+                    <div class="text-gray-900">
+                        <h2 class="font-semibold text-lg">{{ profile_user.profileName }}</h2>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Divider -->
+            <div class="border-t border-gray-200 mb-8"></div>
+            
+            <!-- Posts Grid -->
+            <div class="grid grid-cols-3 gap-1 md:gap-4">
+                {% for post in posts %}
+                <div class="relative aspect-square group animate-fade-in">
+                    <img src="{{ post.imageUrl }}" 
+                         alt="Post" 
+                         class="w-full h-full object-cover rounded-lg"
+                    >
+                    <div class="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-30 transition-all duration-300 rounded-lg flex items-center justify-center opacity-0 group-hover:opacity-100">
+                        <div class="text-white space-x-6">
+                            <span class="inline-flex items-center">
+                                <i class="fas fa-heart mr-2"></i>
+                                {{ post.likes|length }}
+                            </span>
+                            <span class="inline-flex items-center">
+                                <i class="fas fa-comment mr-2"></i>
+                                {{ post.comments|length }}
+                            </span>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+            
+            <!-- Empty State -->
+            {% if not posts %}
+            <div class="text-center py-20">
+                <i class="fas fa-camera text-6xl text-gray-300 mb-4"></i>
+                <h3 class="text-xl font-semibold text-gray-700 mb-2">No posts yet</h3>
+                {% if is_own_profile %}
+                    <p class="text-gray-500 mb-6">Share your first photo</p>
+                    <button onclick="createPost()" 
+                            class="px-6 py-3 bg-primary text-white rounded-lg hover:bg-primary-dark transition-all duration-200">
+                        Create your first post
+                    </button>
+                {% else %}
+                    <p class="text-gray-500">This user hasn't posted anything yet</p>
+                {% endif %}
+            </div>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- Search Results Modal -->
+    <div id="searchModal" class="fixed inset-0 bg-black bg-opacity-50 hidden z-50">
+        <div class="flex items-center justify-center min-h-screen p-4">
+            <div class="bg-white rounded-xl max-w-md w-full shadow-xl transform transition-all">
+                <div class="flex items-center justify-between p-4 border-b border-gray-200">
+                    <h3 class="text-lg font-semibold text-gray-900">Search Results</h3>
+                    <button onclick="closeSearchModal()" class="text-gray-400 hover:text-gray-600">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+                <div class="p-4" id="searchResults">
+                    <!-- Search results will be inserted here -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Firebase JavaScript -->
+    <script type="module" src="/static/firebase-login.js"></script>
+    <script>
+        function getCookie(name) {
+            const value = `; ${document.cookie}`;
+            const parts = value.split(`; ${name}=`);
+            if (parts.length === 2) return parts.pop().split(';').shift();
+            return null;
+        }
+
+        const token = getCookie('token');
+        if (!token) {
+            window.location.href = '/';
+        }
+
+        // Override fetch to include token from cookie
+        const originalFetch = window.fetch;
+        window.fetch = function(url, options = {}) {
+            options.headers = options.headers || {};
+            if (token) {
+                options.headers['Authorization'] = `Bearer ${token}`;
+            }
+            return originalFetch(url, options);
+        };
+
+        async function toggleFollow(userId) {
+            const response = await fetch(`/follow/${userId}`, {
+                method: 'POST'
+            });
+            
+            if (response.ok) {
+                const data = await response.json();
+                const btn = document.getElementById('followBtn');
+                btn.textContent = data.action === 'followed' ? 'Unfollow' : 'Follow';
+                window.location.reload(); // Refresh to update follower count
+            }
+        }
+
+        async function searchUsers() {
+            const query = document.getElementById('searchInput').value;
+            if (!query) return;
+            
+            const response = await fetch(`/search?q=${encodeURIComponent(query)}`);
+            
+            if (response.ok) {
+                const data = await response.json();
+                const resultsDiv = document.getElementById('searchResults');
+                resultsDiv.innerHTML = '';
+                
+                if (data.users.length === 0) {
+                    resultsDiv.innerHTML = '<p class="text-center text-gray-500">No users found</p>';
+                } else {
+                    data.users.forEach(user => {
+                        const userDiv = document.createElement('div');
+                        userDiv.className = 'p-3 hover:bg-gray-50 rounded-lg transition-colors';
+                        userDiv.innerHTML = `
+                            <a href="/profile/${user.id}" class="flex items-center space-x-3">
+                                <div class="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center">
+                                    <i class="fas fa-user text-primary"></i>
+                                </div>
+                                <div>
+                                    <p class="font-semibold text-gray-900">${user.username}</p>
+                                    <p class="text-sm text-gray-500">${user.profileName}</p>
+                                </div>
+                            </a>
+                        `;
+                        resultsDiv.appendChild(userDiv);
+                    });
+                }
+                
+                document.getElementById('searchModal').classList.remove('hidden');
+            }
+        }
+
+        function closeSearchModal() {
+            document.getElementById('searchModal').classList.add('hidden');
+        }
+
+        function createPost() {
+            window.location.href = '/timeline';
+        }
+
+        // Close modal when clicking outside
+        window.onclick = function(event) {
+            const modal = document.getElementById('searchModal');
+            if (event.target === modal) {
+                closeSearchModal();
+            }
+        }
+
+        // Search on Enter key
+        document.getElementById('searchInput').addEventListener('keyup', function(event) {
+            if (event.key === 'Enter') {
+                searchUsers();
+            }
+        });
+    </script>
+</body>
+</html>
