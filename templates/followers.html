@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Followers - {{ user.username }}</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Font Awesome -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <!-- Custom Tailwind Configuration -->
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        'primary': '#38bdf8',
+                        'primary-dark': '#0284c7',
+                        'primary-light': '#bae6fd',
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        /* Custom animations */
+        @keyframes slideIn {
+            from { transform: translateY(10px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+        
+        .animate-slide-in {
+            animation: slideIn 0.3s ease-out forwards;
+        }
+        
+        /* Custom scrollbar */
+        ::-webkit-scrollbar {
+            width: 6px;
+        }
+        
+        ::-webkit-scrollbar-track {
+            background: #f1f1f1;
+        }
+        
+        ::-webkit-scrollbar-thumb {
+            background: #38bdf8;
+            border-radius: 3px;
+        }
+        
+        ::-webkit-scrollbar-thumb:hover {
+            background: #0284c7;
+        }
+    </style>
+</head>
+<body class="bg-gray-50 min-h-screen">
+    <!-- Navigation Bar -->
+    <nav class="bg-white border-b border-gray-200 sticky top-0 z-50 shadow-sm">
+        <div class="container mx-auto px-4">
+            <div class="flex items-center justify-between h-16">
+                <!-- Logo -->
+                <a href="/timeline" class="text-2xl font-bold text-primary hover:text-primary-dark transition-colors">
+                    Instagram Replica
+                </a>
+                
+                <!-- Navigation Actions -->
+                <div class="flex items-center space-x-3">
+                    <a href="/profile/{{ current_user.id }}" 
+                       class="flex items-center px-4 py-2 text-gray-700 hover:text-primary rounded-lg hover:bg-primary-light/20 transition-all duration-200">
+                        <i class="fas fa-user mr-2"></i> 
+                        Profile
+                    </a>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <div class="container mx-auto px-4 py-8">
+        <div class="max-w-2xl mx-auto">
+            <!-- Followers Container -->
+            <div class="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
+                <!-- Header -->
+                <div class="flex items-center justify-between p-6 border-b border-gray-100">
+                    <h1 class="text-xl font-semibold text-gray-900">
+                        Followers of {{ user.username }}
+                    </h1>
+                    <div class="flex items-center space-x-2 text-sm text-gray-500">
+                        <i class="fas fa-users"></i>
+                        <span>{{ followers|length }} followers</span>
+                    </div>
+                </div>
+                
+                <!-- Followers List -->
+                <div class="divide-y divide-gray-100">
+                    {% if followers %}
+                        {% for follower in followers %}
+                        <div class="p-4 hover:bg-gray-50 transition-colors animate-slide-in">
+                            <div class="flex items-center justify-between">
+                                <div class="flex items-center space-x-4">
+                                    <!-- Avatar -->
+                                    <div class="relative">
+                                        <div class="w-12 h-12 rounded-full bg-gradient-to-br from-primary to-primary-dark p-0.5">
+                                            <div class="w-full h-full rounded-full bg-white p-0.5">
+                                                <div class="w-full h-full rounded-full bg-primary/10 flex items-center justify-center">
+                                                    <i class="fas fa-user text-primary"></i>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    
+                                    <!-- User Info -->
+                                    <div>
+                                        <a href="/profile/{{ follower.id }}" 
+                                           class="font-semibold text-gray-900 hover:text-primary transition-colors">
+                                            {{ follower.username }}
+                                        </a>
+                                        <p class="text-sm text-gray-500">{{ follower.profileName }}</p>
+                                    </div>
+                                </div>
+                                
+                                <!-- Visit Profile Button -->
+                                <a href="/profile/{{ follower.id }}" 
+                                   class="px-4 py-2 text-sm text-primary hover:text-primary-dark border border-primary hover:border-primary-dark rounded-lg transition-all duration-200">
+                                    View Profile
+                                </a>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    {% else %}
+                        <!-- Empty State -->
+                        <div class="p-12 text-center">
+                            <div class="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                                <i class="fas fa-user-friends text-2xl text-gray-400"></i>
+                            </div>
+                            <h3 class="text-lg font-medium text-gray-900 mb-2">No followers yet</h3>
+                            <p class="text-gray-500 mb-6">When people follow {{ user.username }}, they'll appear here</p>
+                            {% if user.id == current_user.id %}
+                                <a href="/timeline" 
+                                   class="inline-block px-6 py-2 bg-primary text-white rounded-lg hover:bg-primary-dark transition-all duration-200">
+                                    Go to Timeline
+                                </a>
+                            {% endif %}
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+            
+            <!-- Back Button -->
+            <div class="mt-6 text-center">
+                <a href="/profile/{{ user.id }}" 
+                   class="inline-flex items-center px-6 py-3 text-gray-700 hover:text-primary rounded-lg hover:bg-gray-100 transition-all duration-200">
+                    <i class="fas fa-arrow-left mr-2"></i>
+                    Back to Profile
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Firebase JavaScript -->
+    <script type="module" src="/static/firebase-login.js"></script>
+    <script>
+        function getCookie(name) {
+            const value = `; ${document.cookie}`;
+            const parts = value.split(`; ${name}=`);
+            if (parts.length === 2) return parts.pop().split(';').shift();
+            return null;
+        }
+
+        const token = getCookie('token');
+        if (!token) {
+            window.location.href = '/';
+        }
+    </script>
+</body>
+</html>
